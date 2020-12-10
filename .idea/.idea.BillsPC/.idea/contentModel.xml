@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ContentModelStore">
+    <e p="C:\Users\korea\AppData\Local\JetBrains\Rider2020.2\extResources" t="IncludeRecursive" />
+    <e p="C:\Users\korea\AppData\Local\JetBrains\Rider2020.2\resharper-host\Local\Transient\Rider\v202\SolutionCaches\_BillsPC.-1066229079.00" t="ExcludeRecursive" />
+    <e p="C:\Users\korea\AppData\Roaming\JetBrains\Rider2020.2\consoles\db" t="IncludeRecursive" />
+    <e p="C:\Users\korea\AppData\Roaming\JetBrains\Rider2020.2\extensions" t="IncludeRecursive" />
+    <e p="C:\Users\korea\RiderProjects\BillsPC" t="IncludeFlat">
+      <e p="BillsPC.Airtable" t="IncludeRecursive">
+        <e p="BillsPC.Airtable.csproj" t="IncludeRecursive" />
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="Databases" t="Include">
+          <e p="DatabaseBase.cs" t="Include" />
+          <e p="TeamStorage.cs" t="Include" />
+        </e>
+        <e p="Models" t="Include">
+          <e p="TeamModel.cs" t="Include" />
+          <e p="TeamPokemonModel.cs" t="Include" />
+        </e>
+        <e p="obj" t="ExcludeRecursive">
+          <e p="Debug" t="Include">
+            <e p="netcoreapp3.1" t="Include">
+              <e p="BillsPC.Airtable.AssemblyInfo.cs" t="Include" />
+            </e>
+          </e>
+        </e>
+      </e>
+      <e p="BillsPC.Bot" t="IncludeRecursive">
+        <e p="Attributes" t="Include">
+          <e p="DisabledAttribute.cs" t="Include" />
+        </e>
+        <e p="BillsPC.Bot.csproj" t="IncludeRecursive" />
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="Bot.cs" t="Include" />
+        <e p="Commands" t="Include">
+          <e p="Information.cs" t="Include" />
+          <e p="TeamStorage.cs" t="Include" />
+        </e>
+        <e p="Config.cs" t="Include" />
+        <e p="Global" t="Include">
+          <e p="Commands.cs" t="Include" />
+        </e>
+        <e p="obj" t="ExcludeRecursive">
+          <e p="Debug" t="Include">
+            <e p="netcoreapp3.1" t="Include">
+              <e p="BillsPC.Bot.AssemblyInfo.cs" t="Include" />
+            </e>
+          </e>
+        </e>
+      </e>
+      <e p="BillsPC.Pokemon" t="IncludeRecursive">
+        <e p="Api.cs" t="Include" />
+        <e p="BillsPC.Pokemon.csproj" t="IncludeRecursive" />
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="obj" t="ExcludeRecursive">
+          <e p="Debug" t="Include">
+            <e p="netcoreapp3.1" t="Include">
+              <e p="BillsPC.Pokemon.AssemblyInfo.cs" t="Include" />
+            </e>
+          </e>
+        </e>
+      </e>
+      <e p="BillsPC.sln" t="IncludeFlat" />
+      <e p="BillsPC.Web_Dashboard" t="IncludeRecursive">
+        <e p="_Imports.razor" t="Include" />
+        <e p="App.razor" t="Include" />
+        <e p="appsettings.Development.json" t="Include" />
+        <e p="appsettings.json" t="Include" />
+        <e p="BillsPC.Web_Dashboard.csproj" t="IncludeRecursive" />
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="Components" t="Include">
+          <e p="Toast.razor" t="Include" />
+          <e p="ToastBase.cs" t="Include" />
+        </e>
+        <e p="Data" t="Include">
+          <e p="AccountController.cs" t="Include" />
+          <e p="BannerTimer.cs" t="Include" />
+          <e p="DiscordExtensions.cs" t="Include" />
+          <e p="PokemonModel.cs" t="Include" />
+          <e p="PrefixModel.cs" t="Include" />
+          <e p="TeamModel.cs" t="Include" />
+          <e p="ToastService.cs" t="Include" />
+        </e>
+        <e p="deps" t="Include" />
+        <e p="obj" t="ExcludeRecursive">
+          <e p="Debug" t="Include">
+            <e p="netcoreapp3.1" t="Include">
+              <e p="BillsPC.Web_Dashboard.AssemblyInfo.cs" t="Include" />
+              <e p="BillsPC.Web_Dashboard.RazorAssemblyInfo.cs" t="Include" />
+            </e>
+          </e>
+        </e>
+        <e p="Pages" t="Include">
+          <e p="_Host.cshtml" t="Include" />
+          <e p="Commands.razor" t="Include" />
+          <e p="DamageCalculator.razor" t="Include" />
+          <e p="Error.cshtml" t="Include" />
+          <e p="GuildList.razor" t="Include" />
+          <e p="GuildSettings.razor" t="Include" />
+          <e p="Index.razor" t="Include" />
+          <e p="RedirectToLogin.razor" t="Include" />
+          <e p="Teambuilder.razor" t="Include" />
+        </e>
+        <e p="Program.cs" t="Include" />
+        <e p="Properties" t="Include">
+          <e p="launchSettings.json" t="Include" />
+        </e>
+        <e p="Shared" t="Include">
+          <e p="MainLayout.razor" t="Include" />
+          <e p="NavMenu.razor" t="Include" />
+          <e p="SurveyPrompt.razor" t="Include" />
+        </e>
+        <e p="Startup.cs" t="Include" />
+        <e p="wwwroot" t="Include">
+          <e p="css" t="Include">
+            <e p="bootstrap" t="Include">
+              <e p="bootstrap.min.css" t="Include" />
+              <e p="bootstrap.min.css.map" t="Include" />
+            </e>
+            <e p="open-iconic" t="Include">
+              <e p="font" t="Include">
+                <e p="css" t="Include">
+                  <e p="open-iconic-bootstrap.min.css" t="Include" />
+                </e>
+                <e p="fonts" t="Include">
+                  <e p="open-iconic.eot" t="Include" />
+                  <e p="open-iconic.otf" t="Include" />
+                  <e p="open-iconic.svg" t="Include" />
+                  <e p="open-iconic.ttf" t="Include" />
+                  <e p="open-iconic.woff" t="Include" />
+                </e>
+              </e>
+              <e p="FONT-LICENSE" t="Include" />
+              <e p="ICON-LICENSE" t="Include" />
+              <e p="README.md" t="Include" />
+            </e>
+            <e p="site.css" t="Include" />
+          </e>
+          <e p="favicon.ico" t="Include" />
+        </e>
+      </e>
+      <e p="packages" t="ExcludeRecursive" />
+    </e>
+  </component>
+</project>

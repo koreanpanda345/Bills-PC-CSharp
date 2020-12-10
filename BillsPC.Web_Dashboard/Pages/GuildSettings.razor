@@ -1,0 +1,129 @@
+﻿@page "/GuildSettings/{guildId}"
+@using Bot
+@using BillsPC.Web_Dashboard.Data
+@inject Bot Bot
+@inject ToastService ToastService
+<h3>GuildSettings</h3>
+
+@if (Id != 0)
+{
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <div class="card bg-dark text-light" style="width: 18rem">
+                    <img src="@Bot.GetGuild(Id).IconUrl"/>
+                    <div class="card-body">
+                        <div class="card bg-dark text-light">
+                            <div class="card-header">
+                                Information
+                            </div>
+                            <div class="card-body">
+                                Members: @Bot.GetGuild(Id).Members.Count<br>
+                                Region: @Bot.GetGuild(Id).VoiceRegion.Name
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <a class="btn btn-danger">Leave Server</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card bg-dark text-light">
+                    <div class="card-header">
+                        Settings
+                    </div>
+                    <div class="card-body">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col">
+                                    <div class="card bg-dark text-light">
+                                        <div class="card-header">
+                                            Verbose Mode
+                                        </div>
+                                        <div class="card-body">
+                                            This will descrease the amount of information shown.
+                                        </div>
+                                        <div class="card-footer">
+                                            <button type="button" class="btn btn-dark" @onclick="EnableOrDisableVerboseMode">@IsVerbose()</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                <br>
+                <div class="card bg-dark text-light">
+                    <div class="card-header">
+                        Prefix
+                    </div>
+                    <div class="card-body">
+                        <EditForm Model="@_prefix" OnValidSubmit="@HandleValidSubmit">
+                            <ValidationSummary></ValidationSummary>
+                            <InputText id="prefix" @bind-Value="_prefix.Prefix"></InputText>
+
+                            <button type="submit">Edit Prefix</button>
+                        </EditForm>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    }
+else
+{
+    <h2>Something Happened</h2>
+}
+
+@code {
+    private PrefixModel _prefix = new PrefixModel();
+    
+    [Parameter]
+    public string GuildId { get; set; }
+
+    public ulong Id = 0;
+
+    protected override void OnInitialized()
+    {
+        GuildId = GuildId ?? null;
+        ulong.TryParse(GuildId, out Id);
+    }
+
+    private void DisableOrEnableCommand(string command)
+    {
+        if(Bot.IsCommandEnabled(command, Id)) Bot.DisableCommand(command, Id);
+        else Bot.EnableCommand(command, Id);
+    }
+
+    private string CommandEnabled(string command)
+    {
+        if (!Bot.IsCommandEnabled(command, Id)) return "Enable";
+        return "Disable";
+    }
+    
+
+    private void HandleValidSubmit()
+    {
+        Bot.SetPrefix(Id, _prefix.Prefix);
+
+        ToastService.ShowToast($"Prefix Changed to {_prefix.Prefix}", ToastLevel.Success);
+    }
+    
+    private string GetIcon(string id, string icon)
+    {
+        return $"https://cdn.discordapp.com/icons/{id}/{icon}.jpg";
+    }
+
+    private string IsVerbose()
+    {
+        return Bot.GetVerboseMode(Id) ? "Disable" : "Enable";
+    }
+
+    private void EnableOrDisableVerboseMode()
+    {
+        if(Bot.GetVerboseMode(Id)) Bot.DisableVerboseMode(Id);
+        else Bot.EnableVerboseMode(Id);
+    }
+
+}

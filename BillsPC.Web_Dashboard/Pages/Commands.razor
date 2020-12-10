@@ -1,0 +1,25 @@
+﻿@page "/Commands"
+@using BillsPC.Bot
+@inject Bot Bot
+
+<div class="container bg-dark text-light">
+    <div class="row row-cols-1 row-cols-md-2">
+        @foreach (var command in Bot.GetCommands())
+        {
+            <div class="col mb-4">
+                <div class="card bg-dark text-light">
+                    <div class="card-header">
+                        @command.QualifiedName
+                    </div>
+                    <div class="card-body">
+                        <strong>Description: </strong> @command.Description
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    
+}

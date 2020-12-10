@@ -1,0 +1,33 @@
+﻿@inherits Microsoft.AspNetCore.Components.LayoutComponentBase
+
+
+
+<div class="sidebar">
+    <NavMenu/>
+</div>
+
+<div class="main">
+    <div id="topnav" class="top-row px-4 text-light">
+        <AuthorizeView>
+            <Authorized>
+                <a style="color: white" href="#">Hello, @context.User.Identity.Name!</a>
+                <a style="color: white" href="Account/Logout">Log out</a>
+            </Authorized>
+            <NotAuthorized>
+                <a style="color: white" href="Account/Login">Log in</a>
+            </NotAuthorized>
+        </AuthorizeView>
+    </div>
+
+    <div class="content px-4">
+        @Body
+    </div>
+    <Toast/>
+    </div>
+
+<style>
+    .main{
+        background-image: linear-gradient(180deg, rgb(26, 25, 25) 0%, #8c8b8b 70%);
+        color: whitesmoke;
+    }
+</style>

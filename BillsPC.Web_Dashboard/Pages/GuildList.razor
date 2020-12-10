@@ -1,0 +1,85 @@
+﻿@page "/GuildList"
+@using System.Security.Claims
+@using BillsPC.Web_Dashboard.Data
+@using Newtonsoft.Json
+@inject Bot.Bot Bot
+
+<h3 class="text-center">Guild Configurations</h3>
+
+<AuthorizeView>
+    <Authorized>
+        @if (DiscordExtensions.GuildClaim is null)
+        {
+            <h2>Please relogin so i can get your guilds.</h2>
+        }
+        else
+        {
+            @foreach (var guild in _guilds)
+                {
+                    <div class="card mb-3 bg-dark text-light" style="max-width: 540;">
+                            <div class="row no-gutters">
+                                <div class="col-md-4">
+                                    <img src="@GetIcon(guild.Id, guild.Icon)"/>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="card-body">
+                                    <div class="card-title">
+                                        @guild.Name
+                                        <br>
+                                        <button type="button" class="btn btn-outline-warning" href="@GoToSettings(guild.Id)">@EditButtonText(guild.Id)</button>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                    </div>
+                }
+        }
+    </Authorized>
+</AuthorizeView>
+
+@code
+{
+    private struct Guilds
+    {
+        public string Id { get; set; }
+        public string Name { get; set; }
+        public string Icon { get; set; }
+        public bool Owner { get; set; }
+        public int Permissions { get; set; }
+        public string[] Features { get; set; }
+    }
+
+    private Guilds[] _guilds = new Guilds[]{};
+
+    protected override void OnInitialized()
+    {
+        if (DiscordExtensions.GuildClaim is null) return;
+        var claim = DiscordExtensions.GuildClaim;
+        var str = JsonConvert.DeserializeObject<GuildList.Guilds[]>(claim.Value);
+        _guilds = str;
+        
+    }
+
+    public string EditButtonText(string id)
+    {
+        ulong _id = 0;
+        if (ulong.TryParse(id, out var result)) _id = result;
+
+        return Bot.IsBotInServer(_id) ? "Edit Server" : "Add Bot to server";
+    }
+
+    private string GetIcon(string id, string icon)
+    {
+        return $"https://cdn.discordapp.com/icons/{id}/{icon}.jpg";
+    }
+
+    private string GoToSettings(string id)
+    {
+        ulong _id = 0;
+        if (ulong.TryParse(id, out var result)) _id = result;
+        if (Bot.IsBotInServer(_id)) return $"guildsettings/{_id}";
+        else return "https://discord.com/api/oauth2/authorize?client_id=714573967498936430&permissions=0&redirect_uri=https%3A%2F%2Flocalhost%3A5001%2Fsignin-discord&scope=bot";
+
+    }
+}

@@ -1,0 +1,318 @@
+﻿@page "/Teambuilder"
+@using BillsPC.Pokemon
+@using BillsPC.Web_Dashboard.Data
+@using Pokemon = PokeApiNet.Pokemon
+@using BillsPC.Bot
+@using System.Security.Claims
+@using System.Security.Policy
+@using TeamModel = BillsPC.Airtable.Models.TeamModel
+@using TeamPokemonModel = BillsPC.Airtable.Models.TeamPokemonModel
+@using System.Linq
+@inject Bot Bot
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ToastService ToastService
+@inject NavigationManager NavigationManager
+
+<h3>Teambuilder</h3>
+
+<AuthorizeView>
+    <Authorized>
+        
+        @foreach (var team in _teams)
+        {
+            <div class="card bg-dark text-light">
+                <div class="card-header">
+                    @team.Name
+                </div>
+                <div class="card-body">
+                    <button type="button" @onclick="async () => await ChangeTeamView(GetTeamIndex(team.Name))">Edit Team</button>
+                    <a class="btn btn-outline-light" href="@PasteToPokePaste(team.Name).GetAwaiter().GetResult()" target="_blank">Paste To PokePaste</a>
+                </div>
+            </div>
+        }
+        
+        <div class="card bg-dark text-light">
+            <div class="card-body">
+                <button type="button" @onclick="async () => await NewTeam()">
+                    New Team
+                </button>
+            </div>
+        </div>
+    </Authorized>
+</AuthorizeView>
+    <div class="container">
+        <div class="row">
+            @foreach (var pokemon in _team.Pokemon)
+            {
+                <div class="col">
+                    <div class="card bg-dark text-light mb-3" style="text-align: center;width: 10rem; height: 15rem;">
+                        <div class="card-header">
+                            <button type="button" class="bg-dark text-light" @onclick="async() => await EditPokemon(pokemon.Name)">@pokemon.Name</button>
+                            <button type="button" class="bg-dark text-light" @onclick="() => RemovePokemon(pokemon.Name)">Remove</button>
+                        </div>
+                        <div class="card-img text-center">
+                            <img src="@pokemon.IconUrl"/>
+                        </div>
+
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+<EditForm Model="_model" OnValidSubmit="async () => await HandleValidSubmit()">
+    <InputText id="pokemon" @bind-Value="_model.Name"></InputText>
+    <button type="submit">Add Pokemon</button>
+</EditForm>
+@if (_pokemon is null)
+{
+    <div class="d-flex justify-content-center">
+        <div class="spinner-border" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+}
+else
+{
+    
+    <div class="card bg-dark text-light">
+        <div class="card-header">
+            @ProperCase(_pokemon.Name)
+        </div>
+        <div class="card-img">
+            <div class="card bg-dark text-light">
+                <div class="card-img text-center">
+                    <img src="@GetSprite()"/>
+                </div>
+            </div>
+
+        </div>
+        <div class="card-body">
+            <div class="card bg-dark mx-md-5">
+                <div class="card-header">Types</div>
+                <div class="card-body">
+                    <h4>Type: @ProperCase(GetTypes())</h4>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="card bg-dark mx-md-5">
+                    <div class="card-header">Abilities</div>
+                    <div class="card-body">
+
+                        <EditForm Model="_model" OnValidSubmit="() => HandleAbilityValidSubmit()">
+                            <InputText id="ability" @bind-Value="_model.Ability"></InputText>
+                            <button type="submit">Change Ability</button>
+                        </EditForm>
+                        @foreach (var ability in _pokemon.Abilities)
+                        {
+                            <h3>@ProperCase(ability.Ability.Name)</h3>
+                        }
+                    </div>
+                </div>
+                <div class="card bg-dark mx-md-5">
+                    <div class="card-header">Base Stats</div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <h4>HP: @_pokemon.Stats[0].BaseStat</h4>
+                                <h4>ATK: @_pokemon.Stats[1].BaseStat</h4>
+                                <h4>DEF: @_pokemon.Stats[2].BaseStat</h4>
+                                <h4>SPA: @_pokemon.Stats[3].BaseStat</h4>
+                                <h4>SPD: @_pokemon.Stats[4].BaseStat</h4>
+                                <h4>SPE: @_pokemon.Stats[5].BaseStat</h4>
+                            </div>
+                            <div class="col">
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="card bg-dark mx-md-5 text-center">
+                    <div class="card-body">
+                        <div class="card-title">
+                            Set
+                        </div>
+                        <div class="card-text">
+                            @foreach (var line in GetSet())
+                            {
+                                @line<br>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+}
+
+
+
+@code {
+    private Airtable.Models.TeamModel _teamModel = new Airtable.Models.TeamModel();
+    private int slot = 0;
+    private int teamId = 0;
+    private List<Airtable.Models.TeamModel> _teams = new List<TeamModel>();
+    private Airtable.Models.TeamModel _team = new TeamModel();
+
+    private TeamPokemonModel _model = new TeamPokemonModel()
+    {
+        Name = "pikachu"
+    };
+
+    private Pokemon _pokemon;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _pokemon = await Api.GetPokemon("pikachu");
+        
+        InsertDataIntoTeamModel();
+        var context = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        _teamModel = await GetTeam(teamId);
+        await GetTeams();
+    }
+
+    private string[] GetSet() => _team.Pokemon[slot].ToString().Split("\n");
+
+    private int GetTeamIndex(string name)
+    {
+        return _teams.IndexOf(_teams.Where(x => x.Name == name).FirstOrDefault());
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (_model.Name == "") _model.Name = "pikachu";
+        _pokemon = await Api.GetPokemon(_model.Name);
+        if (_pokemon is null) _pokemon = await Api.GetPokemon("pikachu");
+        InsertDataIntoTeamModel();
+    }
+
+    private Task HandleAbilityValidSubmit()
+    {
+        if (_model.Ability == "") _model.Ability = _team.Pokemon[slot].Ability;
+        else if (_pokemon.Abilities.Where(x => x.Ability.Name.ToLower() == _model.Ability.ToLower()).FirstOrDefault() is null) _model.Ability = _team.Pokemon[slot].Ability;
+        else _team.Pokemon[slot].Ability = ProperCase(_model.Ability);
+        ToastService.ShowToast($"{_team.Pokemon[slot].Name}'s Ability has been changed to {_model.Ability}", ToastLevel.Success);
+        return Task.CompletedTask;
+    }
+
+    private Task HandleEvAndIvs()
+    {
+        foreach (var iv in _model.Ivs)
+        {
+            if (iv.Value <= 31 && iv.Value > 0) _team.Pokemon[slot].Ivs[iv.Key] = iv.Value;
+        }
+        var totalEvs = 0;
+        foreach (var ev in _model.Evs)
+        {
+            if (ev.Value <= 252 && ev.Value > 0 && totalEvs <= 512)
+            {
+                _team.Pokemon[slot].Evs[ev.Key] = ev.Value;
+                totalEvs += ev.Value;
+            }
+        }
+        return Task.CompletedTask;
+    }
+
+    private void InsertDataIntoTeamModel()
+    {
+        _team.Pokemon.Add(new TeamPokemonModel()
+        {
+            Name = ProperCase(_pokemon.Name),
+            NickName = "",
+            Ability = ProperCase(_pokemon.Abilities[0].Ability.Name),
+            Item = "",
+            IconUrl = GetSprite()
+        });
+    }
+
+    private void RemovePokemon(string name)
+    {
+        if (slot == _team.Pokemon.FindIndex(x => x.Name == name)) slot--;
+        _team.Pokemon.Remove(_team.Pokemon.Find(x => x.Name == name));
+    }
+
+    private async Task EditPokemon(string name)
+    {
+        slot = _team.Pokemon.FindIndex(x => x.Name == name);
+        _model.Name = _team.Pokemon[slot].Name;
+        _pokemon = await Api.GetPokemon(_model.Name);
+        if (_pokemon is null) _pokemon = await Api.GetPokemon("pikachu");
+    }
+
+    private string GetSprite() => $"https://play.pokemonshowdown.com/sprites/ani/{_pokemon.Name.ToLower()}.gif";
+    private string GetSprite(string name) => $"https://play.pokemonshowdown.com/sprites/ani/{name.ToLower()}.gif";
+    private string GetTypes() => _pokemon.Types.Count == 2 ? $"{_pokemon.Types[0].Type.Name} | {_pokemon.Types[1].Type.Name}" : _pokemon.Types[0].Type.Name;
+
+    private async Task<Airtable.Models.TeamModel> GetTeam(int num)
+    {
+        var context = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var team = await Bot.GetTeam(Convert.ToUInt64(context.User.FindFirst(x => x.Type == ClaimTypes.NameIdentifier).Value), num);
+        _teamModel = team;
+        return team;
+    }
+
+    private async Task GetTeams()
+    {
+        var context = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var teams = await Bot.GetTeams(Convert.ToUInt64(context.User.FindFirst(x => x.Type == ClaimTypes.NameIdentifier).Value));
+        _teams = teams;
+    }
+
+    private void ChangeTeams(int num) => teamId = num;
+
+    private async Task ChangeTeamView(int num)
+    {
+        _team = _teams[num];
+        foreach (var poke in _team.Pokemon)
+        {
+            poke.IconUrl = GetSprite(poke.Name);
+        }
+        _model.Name = _team.Pokemon[0].Name;
+        _model.Ability = _team.Pokemon[0].Ability;
+        _pokemon = await Api.GetPokemon(_model.Name);
+        ChangeTeams(num);
+    }
+
+    private async Task SaveTeam()
+    {
+        
+    }
+
+    private async Task NewTeam()
+    {
+        slot = 0;
+        _team = new TeamModel()
+        {
+            Name = "Untitled"
+        };
+        _model.Name = "pikachu";
+        _model.Ability = "static";
+        _pokemon = await Api.GetPokemon(_model.Name);
+        InsertDataIntoTeamModel();
+    }
+
+    private async Task<string> PasteToPokePaste(string name)
+    {
+        var set = "";
+        var team = _teams.Where(x => x.Name == name).FirstOrDefault();
+        set = team.ToString();
+        set = set.Replace(":", "%3A");
+        set = set.Replace(" ", "+");
+        set = set.Replace("\n", "%0A");
+        set = set.Replace("%0A", "%0D%0A");
+
+        var context = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var pokepaste = "https://pokepast.es/create";
+        pokepaste += $"?author={context.User.FindFirst(x => x.Type == ClaimTypes.Name).Value}";
+        pokepaste += $"&title={_teams.Where(x => x.Name == name).FirstOrDefault().Name}";
+        pokepaste += $"&paste={set}";
+        var uri = new Uri(pokepaste);
+        return uri.ToString();
+    }
+    private string ProperCase(string str)
+    {
+        if (string.IsNullOrEmpty(str)) return string.Empty;
+        return char.ToUpper(str[0]) + str.Substring(1);
+    }
+}

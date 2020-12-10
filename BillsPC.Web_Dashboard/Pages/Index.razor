@@ -1,0 +1,66 @@
+﻿@page "/"
+@using BillsPC.Bot
+@using BillsPC.Web_Dashboard.Data
+@using DSharpPlus.CommandsNext
+@inject Bot Bot
+@inject Data.BannerTimer Timer
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div class="card bg-dark text-light">
+                <div class="card-header">
+                    Bill's PC is being Rewritten.
+                </div>
+                <div class="card-body">
+                    <div class="card-text">
+                        Progress of when Bill's PC gig update will be completed.
+                        <div class="progress">
+                            <div class="progress-bar bg-warning" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100">20%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div>
+            <div class="card bg-dark text-light">
+                <div class="card-img">
+                    <img src="@Bot.GetAvatarUrl()" style="width: 20rem;"/>
+                </div>
+                <div class="card-header">Bill's PC</div>
+                <div class="card-body">
+                    <div class="card-title">What is Bill's PC</div>
+                    <div class="card-text"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card bg-dark text-light">
+                <div class="card-header">
+                    Bill's PC Stats
+                </div>
+                <div class="card-body">
+                    <strong><span class="oi oi-caret-right"></span> Servers:</strong> @_servers<br>
+                    <strong><span class="oi oi-people"></span>Helping: </strong> @_members<br>
+                    <strong><span class="oi oi-timer"></span>Latency: </strong> @_latency<br>
+                    <strong><span class="oi oi-command"></span>Commands: </strong> @_commands<br>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@code
+{
+    private int _servers;
+    private int _members;
+    private int _latency;
+    private int _commands;
+    protected override void OnInitialized()
+    {
+        _servers = Bot.GetServerCount();
+        _members = Bot.GetMemberCount();
+        _latency = Bot.GetLatency();
+        _commands = Bot.GetCommands().Count;
+    }
+}
